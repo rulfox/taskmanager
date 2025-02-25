@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,6 +64,9 @@ dependencies {
     implementation(libs.timber)
     //Date
     implementation(libs.kotlinx.datetime)
+    //Navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

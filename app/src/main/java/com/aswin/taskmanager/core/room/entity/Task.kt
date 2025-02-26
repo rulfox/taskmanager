@@ -10,6 +10,6 @@ data class Task(
     val title: String,
     val description: String?,
     val priority: Priority,
-    val dueDate: LocalDate?,
+    val dueDate: LocalDate,
     val status: Status = Status.PENDING
 )

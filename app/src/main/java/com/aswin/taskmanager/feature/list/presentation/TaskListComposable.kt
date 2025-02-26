@@ -1,15 +1,14 @@
 package com.aswin.taskmanager.feature.list.presentation
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,60 +17,43 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aswin.taskmanager.core.room.entity.Priority
-import com.aswin.taskmanager.core.room.entity.Task
+import com.aswin.taskmanager.core.room.entity.Status
+import com.aswin.taskmanager.feature.list.data.TaskUiState
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
-fun TaskItem(task: Task){
-    OutlinedCard {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Row(
+fun TaskItem(taskUiState: TaskUiState, onTaskClicked: (TaskUiState) -> Unit = {}){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onTaskClicked(taskUiState) },
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(modifier = Modifier.fillMaxWidth()){
+            Column(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                ) {
-                    Text(
-                        text = task.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = getStatusIcon(task.status),
-                            contentDescription = task.status.name,
-                            tint = getStatusColor(task.status),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = task.status.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = getStatusColor(task.status)
-                        )
-
-                    }
-                }
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = formatDate(task.dueDate),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = taskUiState.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = taskUiState.statusFormatted,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = taskUiState.dueDateFormatted,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
@@ -80,10 +62,15 @@ fun TaskItem(task: Task){
 @Preview(showBackground = true, name = "Light Mode")
 @Composable
 fun TTaskItemPreview() {
-    TaskItem(task = Task(
+    TaskItem(taskUiState = TaskUiState(
         title = "Task 1",
         description = "Description",
         priority = Priority.HIGH,
-        dueDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        dueDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        status = Status.PENDING,
+        dueDateFormatted = "Monday, Jan 15, 2024",
+        priorityFormatted = "High",
+        statusFormatted = "Pending",
+        id = 1
     ))
 }

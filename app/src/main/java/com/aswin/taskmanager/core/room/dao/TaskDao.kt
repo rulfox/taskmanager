@@ -5,23 +5,24 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.aswin.taskmanager.core.room.entity.Status
 import com.aswin.taskmanager.core.room.entity.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
     @Insert
-    suspend fun insertTask(task: Task)
+    suspend fun insertTask(task: Task): Long
 
-    @Update
-    suspend fun updateTask(task: Task)
-
-    @Delete
-    suspend fun deleteTask(task: Task)
+    @Query("DELETE FROM tasks WHERE id = :id")
+    suspend fun deleteTask(id: Int): Int
 
     @Query("SELECT * FROM tasks")
     fun getAllTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE isCompleted = :isCompleted")
-    fun getTasksByStatus(isCompleted: Boolean): Flow<List<Task>>
+    @Query("SELECT * FROM tasks WHERE status = :status")
+    fun getTasksByStatus(status: Status): Flow<List<Task>>
+
+    @Query("UPDATE tasks SET status = :status WHERE id = :id")
+    suspend fun updateTaskStatus(id: Int, status: Status): Int
 }

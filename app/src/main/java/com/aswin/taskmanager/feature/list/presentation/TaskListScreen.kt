@@ -15,11 +15,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TaskListScreen() {
+fun TaskListScreen(onCreateTask: () -> Unit = {}) {
     Box(modifier = Modifier.fillMaxSize()) {
         FloatingActionButton(
             onClick = {
-
+                onCreateTask()
             },
             modifier = Modifier
                 .padding(16.dp)

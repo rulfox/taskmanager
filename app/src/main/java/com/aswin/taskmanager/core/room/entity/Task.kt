@@ -11,5 +11,5 @@ data class Task(
     val description: String?,
     val priority: Priority,
     val dueDate: LocalDate?,
-    val isCompleted: Boolean = false
+    val status: Status = Status.PENDING
 )

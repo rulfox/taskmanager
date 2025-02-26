@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Task Manager</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="priority">Priority</string>
+    <string name="due_date">Due Date</string>
+    <string name="no_due_date">No Due Date</string>
+    <string name="create_task">Create Task</string>
+    <string name="title_required">Title is required</string>
 </resources>

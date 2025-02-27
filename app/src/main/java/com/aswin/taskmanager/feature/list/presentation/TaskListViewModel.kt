@@ -1,14 +1,19 @@
 package com.aswin.taskmanager.feature.list.presentation
 
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aswin.taskmanager.core.room.entity.Status
+import com.aswin.taskmanager.feature.list.data.FilterStatus
 import com.aswin.taskmanager.feature.list.data.TaskListIntent
 import com.aswin.taskmanager.feature.list.data.TaskListState
 import com.aswin.taskmanager.feature.list.data.TaskListUiEvent
 import com.aswin.taskmanager.feature.list.domain.mapper.TaskUiStateMapper
+import com.aswin.taskmanager.feature.list.domain.useCase.DeleteTaskUseCase
 import com.aswin.taskmanager.feature.list.domain.useCase.GetAllTasksUseCase
+import com.aswin.taskmanager.feature.list.domain.useCase.GetTasksByStatusUseCase
+import com.aswin.taskmanager.feature.list.domain.useCase.UpdateTaskStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +29,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
-    private val getAllTasksUseCase: GetAllTasksUseCase,
+    private val updateTaskStatusUseCase: UpdateTaskStatusUseCase,
+    private val getTasksByStatusUseCase: GetTasksByStatusUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
     private val taskUiStateMapper: TaskUiStateMapper
 ) : ViewModel() {
     private var _state = MutableStateFlow(TaskListState())
@@ -34,12 +41,12 @@ class TaskListViewModel @Inject constructor(
     val event: SharedFlow<TaskListUiEvent> = _event.asSharedFlow()
 
     init {
-        observeTasks()
+        observeTasks(statuses = state.value.statuses)
     }
 
-    private fun observeTasks() {
+    private fun observeTasks(statuses: List<Status>) {
         viewModelScope.launch(Dispatchers.IO) {
-            getAllTasksUseCase().collectLatest { tasks ->
+            getTasksByStatusUseCase(statuses).collectLatest { tasks ->
                 tasks.map { task ->
                     taskUiStateMapper.map(task = task)
                 }.let {
@@ -55,21 +62,41 @@ class TaskListViewModel @Inject constructor(
 
             }
             is TaskListIntent.OnTaskDeleted -> {
-                val mutableTasks = _state.value.tasks.toMutableList()
+                viewModelScope.launch {
+                    deleteTaskUseCase(id = intent.taskUiState.id)
+                }
+                /*val mutableTasks = _state.value.tasks.toMutableList()
                 if (mutableTasks.remove(intent.taskUiState)) {
                     _state.value = _state.value.copy(tasks = mutableTasks)
+                }*/
+            }
+            is TaskListIntent.OnTaskCompleted -> {
+                viewModelScope.launch {
+                    updateTaskStatusUseCase(id = intent.taskUiState.id, status = Status.COMPLETED)
+                    /*val updatedTasks = _state.value.tasks.map { task ->
+                        if (task.id == intent.taskUiState.id) {
+                            task.copy(status = Status.COMPLETED)
+                        } else {
+                            task
+                        }
+                    }
+                    _state.value = _state.value.copy(tasks = updatedTasks)*/
                 }
             }
-
-            is TaskListIntent.OnTaskCompleted -> {
-                val updatedTasks = _state.value.tasks.map { task ->
-                    if (task.id == intent.taskUiState.id) {
-                        task.copy(status = Status.COMPLETED)
-                    } else {
-                        task
+            is TaskListIntent.OnFilterApplied -> {
+                val statuses = when(intent.filterStatus){
+                    FilterStatus.ALL -> {
+                        listOf(Status.PENDING, Status.COMPLETED)
+                    }
+                    FilterStatus.PENDING -> {
+                        listOf(Status.PENDING)
+                    }
+                    FilterStatus.COMPLETED -> {
+                        listOf(Status.COMPLETED)
                     }
                 }
-                _state.value = _state.value.copy(tasks = updatedTasks)
+                _state.value = _state.value.copy(statuses = statuses)
+                observeTasks(statuses = statuses)
             }
         }
     }

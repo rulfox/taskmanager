@@ -2,6 +2,7 @@ package com.aswin.taskmanager.feature.list.presentation
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +31,6 @@ import com.aswin.taskmanager.feature.list.data.TaskUiState
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import timber.log.Timber
 
 @Composable
 fun TaskListScreen(
@@ -42,7 +42,8 @@ fun TaskListScreen(
         onTaskClicked = { viewModel.processIntent(TaskListIntent.OnTaskClicked(it)) },
         onTaskDeleted = { viewModel.processIntent(TaskListIntent.OnTaskDeleted(it)) },
         onTaskCompleted = { viewModel.processIntent(TaskListIntent.OnTaskCompleted(it)) },
-        onCreateTaskClicked = { onCreateTask() }
+        onCreateTaskClicked = { onCreateTask() },
+        onFilterApplied = { viewModel.processIntent(TaskListIntent.OnFilterApplied(it)) }
     )
 
     if(isPortrait()){
@@ -61,21 +62,26 @@ fun TaskListingContentLandscape(state: TaskListState, taskListingCallback: TaskL
 fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskListCallback) {
     val deletedItem = remember { mutableStateOf<TaskUiState?>(null) }
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(
-                items = state.tasks,
-                key = { it.id }
-            ) { taskUiState ->
-                SwipeBox(
-                    onDelete = {
-                        taskListingCallback.onTaskDeleted(taskUiState)
-                    },
-                    onComplete = {
-                        taskListingCallback.onTaskCompleted(taskUiState)
-                    },
-                    modifier = Modifier.animateItem()
-                ){
-                    TaskItem(taskUiState = taskUiState, onTaskClicked = taskListingCallback.onTaskClicked)
+        Column {
+            TaskManagerAppBar(
+                onFilterSelected = taskListingCallback.onFilterApplied
+            )
+            LazyColumn(modifier = Modifier.fillMaxSize().weight(1f)) {
+                items(
+                    items = state.tasks,
+                    key = { it.id }
+                ) { taskUiState ->
+                    SwipeBox(
+                        onDelete = {
+                            taskListingCallback.onTaskDeleted(taskUiState)
+                        },
+                        onComplete = {
+                            taskListingCallback.onTaskCompleted(taskUiState)
+                        },
+                        modifier = Modifier.animateItem()
+                    ){
+                        TaskItem(taskUiState = taskUiState, onTaskClicked = taskListingCallback.onTaskClicked)
+                    }
                 }
             }
         }

@@ -24,6 +24,19 @@ class TaskRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteTask(id: Int): Result<String> {
+        try {
+            val taskDeletedResult = taskLocalDataSource.deleteTask(id = id)
+            if(taskDeletedResult > 0) {
+                return Result.success("Task deleted successfully")
+            }
+            return Result.failure(Exception("Task deletion failed"))
+        } catch(e: Exception) {
+            Timber.e(e)
+            return Result.failure(Exception("Task deletion failed"))
+        }
+    }
+
     override suspend fun updateTaskStatus(id: Int, status: Status): Result<String> {
         try {
             val taskUpdatedResult = taskLocalDataSource.updateTaskStatus(id = id, status = status)
@@ -42,7 +55,7 @@ class TaskRepositoryImpl @Inject constructor(
         return taskLocalDataSource.getAllTasks()
     }
 
-    override fun getTasksByStatus(status: Status): Flow<List<Task>> {
-        return taskLocalDataSource.getTasksByStatus(status = status)
+    override fun getTasksByStatus(statuses: List<Status>): Flow<List<Task>> {
+        return taskLocalDataSource.getTasksByStatus(statuses = statuses)
     }
 }

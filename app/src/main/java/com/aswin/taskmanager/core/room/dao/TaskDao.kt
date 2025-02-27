@@ -20,8 +20,8 @@ interface TaskDao {
     @Query("SELECT * FROM tasks")
     fun getAllTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE status = :status")
-    fun getTasksByStatus(status: Status): Flow<List<Task>>
+    @Query("SELECT * FROM tasks WHERE status IN (:statuses)")
+    fun getTasksByStatus(statuses: List<Status>): Flow<List<Task>>
 
     @Query("UPDATE tasks SET status = :status WHERE id = :id")
     suspend fun updateTaskStatus(id: Int, status: Status): Int

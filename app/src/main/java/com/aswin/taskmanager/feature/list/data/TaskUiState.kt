@@ -5,7 +5,7 @@ import com.aswin.taskmanager.core.room.entity.Status
 import kotlinx.datetime.LocalDate
 
 data class TaskUiState(
-    val id: Long,
+    val id: Int,
     val title: String,
     val description: String?,
     val priorityFormatted: String,

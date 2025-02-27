@@ -1,7 +1,5 @@
 package com.aswin.taskmanager.feature.create.data.dataSource
 
-import androidx.room.Insert
-import androidx.room.Query
 import com.aswin.taskmanager.core.room.entity.Status
 import com.aswin.taskmanager.core.room.entity.Task
 import kotlinx.coroutines.flow.Flow
@@ -15,5 +13,5 @@ interface TaskLocalDataSource {
 
     fun getAllTasks(): Flow<List<Task>>
 
-    fun getTasksByStatus(status: Status): Flow<List<Task>>
+    fun getTasksByStatus(statuses: List<Status>): Flow<List<Task>>
 }

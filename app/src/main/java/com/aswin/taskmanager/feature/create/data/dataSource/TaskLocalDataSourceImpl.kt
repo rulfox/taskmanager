@@ -25,7 +25,7 @@ class TaskLocalDataSourceImpl @Inject constructor(
         return taskDao.getAllTasks()
     }
 
-    override fun getTasksByStatus(status: Status): Flow<List<Task>> {
-        return taskDao.getTasksByStatus(status = status)
+    override fun getTasksByStatus(statuses: List<Status>): Flow<List<Task>> {
+        return taskDao.getTasksByStatus(statuses = statuses)
     }
 }

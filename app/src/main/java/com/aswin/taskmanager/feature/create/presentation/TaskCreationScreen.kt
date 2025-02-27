@@ -51,7 +51,7 @@ import com.aswin.taskmanager.feature.create.data.model.TaskCreationUiEvent
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun TaskCreationScreen(viewModel: TaskCreationViewModel = hiltViewModel(), onTaskCreated: () -> Unit) {
+fun TaskCreationScreen(viewModel: TaskCreationViewModel = hiltViewModel(), onBackPressed: () -> Unit) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
@@ -63,19 +63,22 @@ fun TaskCreationScreen(viewModel: TaskCreationViewModel = hiltViewModel(), onTas
                 }
                 is TaskCreationUiEvent.TaskCreated -> {
                     context.showShortToast(message = event.message)
-                    onTaskCreated()
+                    onBackPressed()
+                }
+                TaskCreationUiEvent.OnBackPressed -> {
+                    onBackPressed()
                 }
             }
         }
     }
-
     val taskCreationCallback = TaskCreationCallback(
         onTitleChanged = { viewModel.processIntent(TaskCreationIntent.TitleChanged(it)) },
         onDescriptionChanged = { viewModel.processIntent(TaskCreationIntent.DescriptionChanged(it)) },
         onPriorityChanged = { viewModel.processIntent(TaskCreationIntent.PriorityChanged(it)) },
         onDateChanged = { viewModel.processIntent(TaskCreationIntent.DueDateChanged(it)) },
         onCreateTask = { viewModel.processIntent(TaskCreationIntent.CreateTask) },
-        onToggleDatePicker = { viewModel.processIntent(TaskCreationIntent.ToggleDatePicker(it)) }
+        onToggleDatePicker = { viewModel.processIntent(TaskCreationIntent.ToggleDatePicker(it)) },
+        onBackPressed = { viewModel.processIntent(TaskCreationIntent.OnBackPressed) }
     )
 
     if(isPortrait()){
@@ -101,119 +104,124 @@ fun TaskCreationContentPortrait(
 ) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        CreateTaskAppbar(onBackPressed = {
+            taskCreationCallback.onBackPressed()
+        })
+        Column(
+            modifier = Modifier
+                .fillMaxSize().weight(1f)
+                .padding(16.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        OutlinedTextField(
-            value = state.title,
-            onValueChange = taskCreationCallback.onTitleChanged,
-            label = { Text(text = stringResource(R.string.title)) }, // Use string resources
-            modifier = Modifier.fillMaxWidth(),
-            isError = false,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Set the desired IME action
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                }
-            ),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = state.description?:"",
-            onValueChange = taskCreationCallback.onDescriptionChanged,
-            label = {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.description)
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        // Priority Dropdown
-        var expanded by remember { mutableStateOf(false) }
-        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
             OutlinedTextField(
-                readOnly = true,
-                value = state.priority.label,
-                onValueChange = {  },
-                label = { Text(stringResource(R.string.priority)) },
-                trailingIcon = {
-                    IconButton(onClick = {
-                        expanded = !expanded
-                    }) {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                value = state.title,
+                onValueChange = taskCreationCallback.onTitleChanged,
+                label = { Text(text = stringResource(R.string.title)) }, // Use string resources
+                modifier = Modifier.fillMaxWidth(),
+                isError = false,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Set the desired IME action
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.moveFocus(FocusDirection.Down)
                     }
+                ),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = state.description?:"",
+                onValueChange = taskCreationCallback.onDescriptionChanged,
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.description)
+                    )
                 },
-                modifier = Modifier.fillMaxWidth().menuAnchor()
+                modifier = Modifier.fillMaxWidth(),
             )
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                state.priorities.forEach { priority ->
-                    DropdownMenuItem(text = {
-                        Text(text = priority.label)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            // Priority Dropdown
+            var expanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                OutlinedTextField(
+                    readOnly = true,
+                    value = state.priority.label,
+                    onValueChange = {  },
+                    label = { Text(stringResource(R.string.priority)) },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            expanded = !expanded
+                        }) {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        }
                     },
-                    onClick = {
-                        expanded = false
-                        taskCreationCallback.onPriorityChanged(priority)
-                    })
+                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                )
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    state.priorities.forEach { priority ->
+                        DropdownMenuItem(text = {
+                            Text(text = priority.label)
+                        },
+                            onClick = {
+                                expanded = false
+                                taskCreationCallback.onPriorityChanged(priority)
+                            })
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // Due Date Picker
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                readOnly = true,
-                value = state.dueDate.toString(),
-                onValueChange = {},
-                label = { Text(stringResource(R.string.due_date)) },
-                modifier = Modifier.weight(1f),
-                trailingIcon = {
-                    IconButton(onClick = {
-                        taskCreationCallback.onToggleDatePicker(true)
-                    }) {
-                        Icon(imageVector = androidx.compose.material.icons.Icons.Filled.DateRange, contentDescription = "Select Date")
+            // Due Date Picker
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    readOnly = true,
+                    value = state.dueDate.toString(),
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.due_date)) },
+                    modifier = Modifier.weight(1f),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            taskCreationCallback.onToggleDatePicker(true)
+                        }) {
+                            Icon(imageVector = androidx.compose.material.icons.Icons.Filled.DateRange, contentDescription = "Select Date")
+                        }
                     }
-                }
-            )
+                )
 
-            if (state.showDatePicker) {
-                DatePickerDialog(LocalContext.current, { _: DatePicker, selectedYear, selectedMonth, selectedDay ->
-                    taskCreationCallback.apply {
-                        onDateChanged(LocalDate(selectedYear, selectedMonth + 1, selectedDay))
-                        onToggleDatePicker(false)
+                if (state.showDatePicker) {
+                    DatePickerDialog(LocalContext.current, { _: DatePicker, selectedYear, selectedMonth, selectedDay ->
+                        taskCreationCallback.apply {
+                            onDateChanged(LocalDate(selectedYear, selectedMonth + 1, selectedDay))
+                            onToggleDatePicker(false)
+                        }
+                    }, state.dueDate.dayOfMonth, state.dueDate.monthNumber, state.dueDate.year).apply {
+                        setOnCancelListener {
+                            taskCreationCallback.onToggleDatePicker(false)
+                        }
+                        show()
                     }
-                }, state.dueDate.dayOfMonth, state.dueDate.monthNumber, state.dueDate.year).apply {
-                    setOnCancelListener {
-                        taskCreationCallback.onToggleDatePicker(false)
-                    }
-                    show()
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = taskCreationCallback.onCreateTask,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = true
-        ) {
-            Text(stringResource(R.string.create_task))
+            Button(
+                onClick = taskCreationCallback.onCreateTask,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = true
+            ) {
+                Text(stringResource(R.string.create_task))
+            }
         }
     }
 }

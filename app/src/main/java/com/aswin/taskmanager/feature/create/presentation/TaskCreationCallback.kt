@@ -9,5 +9,6 @@ data class TaskCreationCallback (
     val onPriorityChanged: (PriorityState) -> Unit = {},
     val onDateChanged: (LocalDate) -> Unit = {},
     val onCreateTask: () -> Unit = {},
-    val onToggleDatePicker: (Boolean) -> Unit = {}
+    val onToggleDatePicker: (Boolean) -> Unit = {},
+    val onBackPressed: () -> Unit = {}
 )

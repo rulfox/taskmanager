@@ -60,6 +60,11 @@ class TaskCreationViewModel @Inject constructor(
             is TaskCreationIntent.ToggleDatePicker -> {
                 _state.value = _state.value.copy(showDatePicker = taskCreationIntent.showDatePicker)
             }
+            TaskCreationIntent.OnBackPressed -> {
+                viewModelScope.launch {
+                    _event.emit(TaskCreationUiEvent.OnBackPressed)
+                }
+            }
         }
     }
 }

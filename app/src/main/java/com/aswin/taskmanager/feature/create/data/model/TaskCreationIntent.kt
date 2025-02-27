@@ -9,4 +9,5 @@ sealed class TaskCreationIntent {
     data class PriorityChanged(val newPriority: PriorityState) : TaskCreationIntent()
     data object CreateTask : TaskCreationIntent()
     data class ToggleDatePicker(val showDatePicker: Boolean): TaskCreationIntent()
+    data object OnBackPressed: TaskCreationIntent()
 }

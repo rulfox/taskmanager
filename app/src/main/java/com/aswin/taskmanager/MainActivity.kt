@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     })
                 }
                 composable<Screen.TaskCreationScreen> {
-                    TaskCreationScreen(onTaskCreated = {
+                    TaskCreationScreen(onBackPressed = {
                         navController.navigateUp()
                     })
                 }

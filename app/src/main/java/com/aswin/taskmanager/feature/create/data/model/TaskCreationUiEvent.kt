@@ -6,4 +6,5 @@ package com.aswin.taskmanager.feature.create.data.model
 sealed class TaskCreationUiEvent {
     data class TaskCreated(val message: String) : TaskCreationUiEvent()
     data class ShowError(val message: String) : TaskCreationUiEvent()
+    data object OnBackPressed: TaskCreationUiEvent()
 }

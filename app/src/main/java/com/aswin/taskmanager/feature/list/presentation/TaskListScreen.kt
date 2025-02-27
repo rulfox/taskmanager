@@ -13,6 +13,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +30,7 @@ import com.aswin.taskmanager.feature.list.data.TaskUiState
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import timber.log.Timber
 
 @Composable
 fun TaskListScreen(
@@ -37,6 +40,8 @@ fun TaskListScreen(
     val state by viewModel.state.collectAsState()
     val taskListingCallback = TaskListCallback(
         onTaskClicked = { viewModel.processIntent(TaskListIntent.OnTaskClicked(it)) },
+        onTaskDeleted = { viewModel.processIntent(TaskListIntent.OnTaskDeleted(it)) },
+        onTaskCompleted = { viewModel.processIntent(TaskListIntent.OnTaskCompleted(it)) },
         onCreateTaskClicked = { onCreateTask() }
     )
 
@@ -54,10 +59,24 @@ fun TaskListingContentLandscape(state: TaskListState, taskListingCallback: TaskL
 
 @Composable
 fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskListCallback) {
+    val deletedItem = remember { mutableStateOf<TaskUiState?>(null) }
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(state.tasks) { taskUiState ->
-                TaskItem(taskUiState = taskUiState, onTaskClicked = taskListingCallback.onTaskClicked)
+            items(
+                items = state.tasks,
+                key = { it.id }
+            ) { taskUiState ->
+                SwipeBox(
+                    onDelete = {
+                        taskListingCallback.onTaskDeleted(taskUiState)
+                    },
+                    onComplete = {
+                        taskListingCallback.onTaskCompleted(taskUiState)
+                    },
+                    modifier = Modifier.animateItem()
+                ){
+                    TaskItem(taskUiState = taskUiState, onTaskClicked = taskListingCallback.onTaskClicked)
+                }
             }
         }
 

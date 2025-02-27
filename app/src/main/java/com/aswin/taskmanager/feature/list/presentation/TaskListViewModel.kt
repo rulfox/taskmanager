@@ -1,7 +1,9 @@
 package com.aswin.taskmanager.feature.list.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aswin.taskmanager.core.room.entity.Status
 import com.aswin.taskmanager.feature.list.data.TaskListIntent
 import com.aswin.taskmanager.feature.list.data.TaskListState
 import com.aswin.taskmanager.feature.list.data.TaskListUiEvent
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,6 +53,23 @@ class TaskListViewModel @Inject constructor(
         when(intent){
             is TaskListIntent.OnTaskClicked -> {
 
+            }
+            is TaskListIntent.OnTaskDeleted -> {
+                val mutableTasks = _state.value.tasks.toMutableList()
+                if (mutableTasks.remove(intent.taskUiState)) {
+                    _state.value = _state.value.copy(tasks = mutableTasks)
+                }
+            }
+
+            is TaskListIntent.OnTaskCompleted -> {
+                val updatedTasks = _state.value.tasks.map { task ->
+                    if (task.id == intent.taskUiState.id) {
+                        task.copy(status = Status.COMPLETED)
+                    } else {
+                        task
+                    }
+                }
+                _state.value = _state.value.copy(tasks = updatedTasks)
             }
         }
     }

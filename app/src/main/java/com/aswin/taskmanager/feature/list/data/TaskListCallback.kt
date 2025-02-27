@@ -5,5 +5,7 @@ import kotlinx.datetime.LocalDate
 
 data class TaskListCallback (
     val onTaskClicked: (TaskUiState) -> Unit = {},
-    val onCreateTaskClicked: () -> Unit = {}
+    val onCreateTaskClicked: () -> Unit = {},
+    val onTaskDeleted:(TaskUiState) -> Unit = {},
+    val onTaskCompleted: (TaskUiState) -> Unit = {}
 )

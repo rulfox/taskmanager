@@ -7,6 +7,7 @@ import com.aswin.taskmanager.feature.create.data.model.TaskCreationIntent
 import com.aswin.taskmanager.feature.create.data.model.TaskCreationState
 import com.aswin.taskmanager.feature.create.data.model.TaskCreationUiEvent
 import com.aswin.taskmanager.feature.create.domain.useCase.CreateTaskUseCase
+import com.aswin.taskmanager.feature.create.domain.useCase.ValidateTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskCreationViewModel @Inject constructor(
+    private val validateTaskUseCase: ValidateTaskUseCase,
     private val createTaskUseCase: CreateTaskUseCase
 ) : ViewModel() {
     private var _state = MutableStateFlow(TaskCreationState())
@@ -38,10 +40,14 @@ class TaskCreationViewModel @Inject constructor(
                         priority = _state.value.priority.level,
                         dueDate = _state.value.dueDate
                     )
-                    createTaskUseCase(task = task).onSuccess {
-                        _event.emit(TaskCreationUiEvent.TaskCreated(message = it))
-                    }.onFailure {
-                        _event.emit(TaskCreationUiEvent.ShowError(it.message ?: "Failed to create task"))
+                    validateTaskUseCase(task = task).onFailure {
+                        _event.emit(TaskCreationUiEvent.ShowError(message = it.message?:"Failed to create task"))
+                    }.onSuccess {
+                        createTaskUseCase(task = task).onSuccess {
+                            _event.emit(TaskCreationUiEvent.TaskCreated(message = it))
+                        }.onFailure {
+                            _event.emit(TaskCreationUiEvent.ShowError(it.message ?: "Failed to create task"))
+                        }
                     }
                 }
             }

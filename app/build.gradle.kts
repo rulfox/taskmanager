@@ -68,7 +68,9 @@ dependencies {
     //Navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
-
+    //Lottie
+    implementation(libs.lottie.compose)
+    //Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

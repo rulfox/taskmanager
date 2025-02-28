@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -104,23 +105,36 @@ fun PriorityDropDown(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box {
-            PriorityDropDownItem(priorityState = selectedPriorityState){
-                isDropDownExpanded.value = true
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(size = 15.dp))
+                    .clickable(enabled = true, onClick = { isDropDownExpanded.value = true }),
+            ) {
+                PriorityDropDownItem(
+                    priorityState = selectedPriorityState
+                )
             }
             DropdownMenu(
+                modifier = Modifier.fillMaxWidth(),
                 expanded = isDropDownExpanded.value,
                 onDismissRequest = {
                     isDropDownExpanded.value = false
                 }) {
                 priorities.forEachIndexed { index, priorityState ->
-                    DropdownMenuItem(text = {
-                        PriorityDropDownItem(priorityState = priorityState)
-                    },
+                    DropdownMenuItem(
+                        modifier = Modifier.background(Color.Transparent),
+                        text = {
+                            PriorityDropDownItem(
+                                priorityState = priorityState
+                            )
+                        },
                         onClick = {
                             isDropDownExpanded.value = false
                             onPriorityStateChanged(priorityState)
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -128,46 +142,37 @@ fun PriorityDropDown(
 }
 
 @Composable
-fun PriorityDropDownItem(priorityState: PriorityState, onClicked: () -> Unit = {}){
-    Card(
-        modifier = Modifier
-            .clickable(enabled = true, onClick = {
-                onClicked()
-            })
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(size = 15.dp))
+fun PriorityDropDownItem(priorityState: PriorityState){
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp),
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp),
-        ) {
-            Image(
-                modifier = Modifier.padding(top = 4.dp),
-                painter = painterResource(id = R.drawable.priority_high),
-                contentDescription = "Task Icon"
+        Image(
+            modifier = Modifier.padding(top = 4.dp),
+            painter = painterResource(id = R.drawable.priority_high),
+            contentDescription = "Task Icon"
+        )
+        Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = "Priority",
+                style = MaterialTheme.typography.labelSmall
             )
-            Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                Text(
-                    modifier = Modifier.padding(start = 8.dp),
-                    text = "Priority",
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Text(
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
-                    text = priorityState.label,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .requiredWidth(width = 10.dp)
-                    .requiredHeight(height = 25.dp)
-                    .clip(shape = RoundedCornerShape(22.dp))
-                    .background(color = priorityState.color)
+            Text(
+                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                text = priorityState.label,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .requiredWidth(width = 10.dp)
+                .requiredHeight(height = 25.dp)
+                .clip(shape = RoundedCornerShape(22.dp))
+                .background(color = priorityState.color)
+        )
     }
 }
 

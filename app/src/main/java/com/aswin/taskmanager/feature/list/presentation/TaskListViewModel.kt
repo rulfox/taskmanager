@@ -50,7 +50,7 @@ class TaskListViewModel @Inject constructor(
                 tasks.map { task ->
                     taskUiStateMapper.map(task = task)
                 }.let {
-                    _state.value = _state.value.copy(tasks = it)
+                    _state.value = _state.value.copy(tasks = it, showEmptyTasks = it.isEmpty())
                 }
             }
         }

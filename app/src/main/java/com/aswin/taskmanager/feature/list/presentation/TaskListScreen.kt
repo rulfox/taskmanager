@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.aswin.taskmanager.R
 import com.aswin.taskmanager.core.room.entity.Priority
 import com.aswin.taskmanager.core.room.entity.Status
 import com.aswin.taskmanager.core.util.ComposeUtils.isPortrait
@@ -86,6 +93,12 @@ fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskLi
                     }
                 }
             }
+        }
+
+        if(state.showEmptyTasks){
+            EmptyTasksPlaceHolder(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         FloatingActionButton(

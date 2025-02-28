@@ -20,7 +20,9 @@ class TaskUiStateMapper @Inject constructor() {
             status = task.status,
             priorityFormatted = getPriorityState(priority = task.priority).label,
             dueDateFormatted = task.dueDate.toJavaLocalDate().format(formatter),
-            statusFormatted = task.status.name
+            statusFormatted = task.status.name,
+            showDescription = !task.description.isNullOrEmpty(),
+            priorityColor = getPriorityState(priority = task.priority).color
         )
     }
 }

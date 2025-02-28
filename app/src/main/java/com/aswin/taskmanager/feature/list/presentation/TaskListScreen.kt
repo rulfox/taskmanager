@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -112,7 +113,9 @@ fun TaskListingContentPortraitPreviewLight() {
                 dueDateFormatted = "Monday, Jan 15, 2024",
                 priorityFormatted = "High",
                 statusFormatted = "Pending",
-                id = 1
+                id = 1,
+                showDescription = true,
+                priorityColor = Color(0xfff99600)
             )
         )
     ), taskListingCallback = TaskListCallback())

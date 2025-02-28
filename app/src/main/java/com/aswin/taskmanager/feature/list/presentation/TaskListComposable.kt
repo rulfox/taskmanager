@@ -1,7 +1,5 @@
 package com.aswin.taskmanager.feature.list.presentation
 
-import android.graphics.drawable.Icon
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,13 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
@@ -31,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -43,13 +40,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,28 +69,70 @@ fun TaskItem(taskUiState: TaskUiState, onTaskClicked: (TaskUiState) -> Unit = {}
             .clickable { onTaskClicked(taskUiState) },
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth()){
-            Column(
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center
-            ) {
+                    .padding(top = 9.dp, end = 16.dp)
+                    .clip(shape = RoundedCornerShape(31.dp))
+                    .background(color = Color(0xfff0f0f0))
+                    .align(alignment = Alignment.TopEnd)
+            ){
                 Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = taskUiState.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = taskUiState.statusFormatted,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
+                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
                     text = taskUiState.dueDateFormatted,
                     style = MaterialTheme.typography.bodySmall
                 )
+            }
+            Row(modifier = Modifier.fillMaxWidth()){
+                Column(
+                    modifier = Modifier
+                        .padding(top = 16.dp, bottom = 26.dp, start = 16.dp, end = 16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row {
+                        Box(
+                            modifier = Modifier
+                                .requiredWidth(width = 10.dp)
+                                .requiredHeight(height = 38.dp)
+                                .clip(shape = RoundedCornerShape(22.dp))
+                                .background(color = taskUiState.priorityColor)
+                        )
+                        Column(modifier = Modifier.fillMaxWidth().padding(start = 8.dp)) {
+                            Text(
+                                text = "Task 1",
+                                color = Color(0xff6e6a7c),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = taskUiState.title,
+                                style = MaterialTheme.typography.titleLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                    if(taskUiState.showDescription){
+                        Text(
+                            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                            text = "Description",
+                            color = Color(0xff6e6a7c),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                            text = taskUiState.description?:"",
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    /*Text(
+                        text = taskUiState.statusFormatted,
+                        style = MaterialTheme.typography.bodySmall
+                    )*/
+                }
             }
         }
     }
@@ -258,14 +296,16 @@ fun TaskManagerAppBar(onFilterSelected: (FilterStatus) -> Unit) {
 @Composable
 fun TTaskItemPreview() {
     TaskItem(taskUiState = TaskUiState(
-        title = "Task 1",
-        description = "Description",
+        title = "Cooking Biriyani",
+        description = "This application is designed for super shops. By using this application they can enlist all their products in one place and can deliver. Customers will get a one-stop solution for their daily shopping.",
         priority = Priority.HIGH,
         dueDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
         status = Status.PENDING,
         dueDateFormatted = "Monday, Jan 15, 2024",
         priorityFormatted = "High",
         statusFormatted = "Pending",
-        id = 1
+        id = 1,
+        showDescription = true,
+        priorityColor = Color(0xfff99600)
     ))
 }

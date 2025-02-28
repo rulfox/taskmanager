@@ -1,5 +1,6 @@
 package com.aswin.taskmanager.feature.list.data
 
+import androidx.compose.ui.graphics.Color
 import com.aswin.taskmanager.core.room.entity.Priority
 import com.aswin.taskmanager.core.room.entity.Status
 import kotlinx.datetime.LocalDate
@@ -13,5 +14,7 @@ data class TaskUiState(
     val statusFormatted: String,
     val priority: Priority,
     val dueDate: LocalDate,
-    val status: Status
+    val status: Status,
+    val showDescription: Boolean,
+    val priorityColor: Color
 )

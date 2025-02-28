@@ -4,27 +4,39 @@ import android.app.DatePickerDialog
 import android.content.res.Configuration
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,10 +46,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.geometry.isEmpty
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -104,123 +122,162 @@ fun TaskCreationContentPortrait(
 ) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
-    Column(modifier = Modifier.fillMaxWidth()) {
-        CreateTaskAppbar(onBackPressed = {
-            taskCreationCallback.onBackPressed()
-        })
-        Column(
-            modifier = Modifier
-                .fillMaxSize().weight(1f)
-                .padding(16.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            CreateTaskAppbar(onBackPressed = {
+                taskCreationCallback.onBackPressed()
+            })
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.Start
+            ) {
 
-            OutlinedTextField(
-                value = state.title,
-                onValueChange = taskCreationCallback.onTitleChanged,
-                label = { Text(text = stringResource(R.string.title)) }, // Use string resources
-                modifier = Modifier.fillMaxWidth(),
-                isError = false,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Set the desired IME action
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                ),
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = state.description?:"",
-                onValueChange = taskCreationCallback.onDescriptionChanged,
-                label = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.description)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            // Priority Dropdown
-            var expanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                OutlinedTextField(
-                    readOnly = true,
-                    value = state.priority.label,
-                    onValueChange = {  },
-                    label = { Text(stringResource(R.string.priority)) },
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            expanded = !expanded
-                        }) {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Create Task",
+                    style = MaterialTheme.typography.headlineMedium
                 )
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    state.priorities.forEach { priority ->
-                        DropdownMenuItem(text = {
-                            Text(text = priority.label)
-                        },
-                            onClick = {
-                                expanded = false
-                                taskCreationCallback.onPriorityChanged(priority)
-                            })
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth().padding(top = 22.dp)
+                        .clip(shape = RoundedCornerShape(size = 15.dp))
+                ) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp)) {
+                        Image(
+                            modifier = Modifier.padding(top = 4.dp),
+                            painter = painterResource(id = R.drawable.task_icon),
+                            contentDescription = "Task Icon"
+                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = "Task Name",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            BasicTextField(
+                                value = state.title,
+                                onValueChange = taskCreationCallback.onTitleChanged,
+                                textStyle = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.fillMaxWidth(),
+                                decorationBox = { innerTextField ->
+                                    Box(modifier = Modifier.fillMaxWidth().padding(start = 8.dp)) {
+                                        innerTextField()
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                PriorityDropDown(
+                    modifier = Modifier.fillMaxWidth().padding(top = 22.dp),
+                    priorities = state.priorities,
+                    selectedPriorityState = state.priority,
+                    onPriorityStateChanged = taskCreationCallback.onPriorityChanged
+                )
 
-            // Due Date Picker
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    readOnly = true,
-                    value = state.dueDate.toString(),
-                    onValueChange = {},
-                    label = { Text(stringResource(R.string.due_date)) },
-                    modifier = Modifier.weight(1f),
-                    trailingIcon = {
-                        IconButton(onClick = {
+                Card(
+                    modifier = Modifier
+                        .padding(top = 22.dp)
+                        .clickable {
                             taskCreationCallback.onToggleDatePicker(true)
-                        }) {
-                            Icon(imageVector = androidx.compose.material.icons.Icons.Filled.DateRange, contentDescription = "Select Date")
                         }
-                    }
-                )
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(size = 15.dp))
+                ) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp),
+                    ) {
+                        Image(
+                            modifier = Modifier.padding(top = 4.dp),
+                            painter = painterResource(id = R.drawable.rounded_calendar),
+                            contentDescription = "Due Date"
+                        )
+                        Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = "Due Date",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                                text = "30 June, 2025",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
 
-                if (state.showDatePicker) {
-                    DatePickerDialog(LocalContext.current, { _: DatePicker, selectedYear, selectedMonth, selectedDay ->
-                        taskCreationCallback.apply {
-                            onDateChanged(LocalDate(selectedYear, selectedMonth + 1, selectedDay))
-                            onToggleDatePicker(false)
-                        }
-                    }, state.dueDate.dayOfMonth, state.dueDate.monthNumber, state.dueDate.year).apply {
-                        setOnCancelListener {
-                            taskCreationCallback.onToggleDatePicker(false)
-                        }
-                        show()
+                        Image(
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            painter = painterResource(id = R.drawable.rounded_arrow_drop_down),
+                            contentDescription = "Due Date"
+                        )
                     }
                 }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth().padding(top = 22.dp)
+                        .clip(shape = RoundedCornerShape(size = 15.dp))
+                ) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp)) {
+                        Image(
+                            modifier = Modifier.padding(top = 4.dp),
+                            painter = painterResource(id = R.drawable.description),
+                            contentDescription = "Description"
+                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = "Description",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            BasicTextField(
+                                value = state.description?:"",
+                                onValueChange = taskCreationCallback.onTitleChanged,
+                                textStyle = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.fillMaxWidth(),
+                                decorationBox = { innerTextField ->
+                                    Box(modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 80.dp).padding(start = 8.dp)) {
+                                        innerTextField()
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = taskCreationCallback.onCreateTask,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = true
+                ) {
+                    Text(stringResource(R.string.create_task))
+                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = taskCreationCallback.onCreateTask,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = true
-            ) {
-                Text(stringResource(R.string.create_task))
+        }
+        if (state.showDatePicker) {
+            DatePickerDialog(LocalContext.current, { _: DatePicker, selectedYear, selectedMonth, selectedDay ->
+                taskCreationCallback.apply {
+                    onDateChanged(LocalDate(selectedYear, selectedMonth + 1, selectedDay))
+                    onToggleDatePicker(false)
+                }
+            }, state.dueDate.dayOfMonth, state.dueDate.monthNumber, state.dueDate.year).apply {
+                setOnCancelListener {
+                    taskCreationCallback.onToggleDatePicker(false)
+                }
+                show()
             }
         }
     }

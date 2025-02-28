@@ -193,3 +193,20 @@ fun DropDownDemoPreview() {
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun CreateTaskAppbarPreview() {
+    TaskManagerTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                CreateTaskAppbar(
+                    onBackPressed = {}
+                )
+            }
+        }
+    }
+}

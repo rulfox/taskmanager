@@ -2,6 +2,7 @@ package com.aswin.taskmanager.feature.create.presentation
 
 import android.app.DatePickerDialog
 import android.content.res.Configuration
+import android.widget.Button
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -62,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aswin.taskmanager.R
 import com.aswin.taskmanager.core.util.ComposeUtils.isPortrait
+import com.aswin.taskmanager.core.util.formatDate
 import com.aswin.taskmanager.core.util.showShortToast
 import com.aswin.taskmanager.feature.create.data.model.TaskCreationIntent
 import com.aswin.taskmanager.feature.create.data.model.TaskCreationState
@@ -209,7 +211,7 @@ fun TaskCreationContentPortrait(
                             )
                             Text(
                                 modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
-                                text = "30 June, 2025",
+                                text = state.dueDate.formatDate(pattern = "d MMMM, yyyy"),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -259,21 +261,35 @@ fun TaskCreationContentPortrait(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = taskCreationCallback.onCreateTask,
+                    shape = RoundedCornerShape(size = 15.dp),
                     modifier = Modifier.fillMaxWidth(),
+                    onClick = taskCreationCallback.onCreateTask,
                     enabled = true
                 ) {
-                    Text(stringResource(R.string.create_task))
+                    Text(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        text = stringResource(R.string.create_task),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             }
         }
         if (state.showDatePicker) {
-            DatePickerDialog(LocalContext.current, { _: DatePicker, selectedYear, selectedMonth, selectedDay ->
-                taskCreationCallback.apply {
-                    onDateChanged(LocalDate(selectedYear, selectedMonth + 1, selectedDay))
-                    onToggleDatePicker(false)
-                }
-            }, state.dueDate.dayOfMonth, state.dueDate.monthNumber, state.dueDate.year).apply {
+            val initialYear = state.dueDate.year
+            val initialMonth = state.dueDate.monthNumber - 1
+            val initialDay = state.dueDate.dayOfMonth
+
+            DatePickerDialog(
+                LocalContext.current,
+                { _: DatePicker, year: Int, month: Int, day: Int ->
+                    val selectedDate = LocalDate(year, month + 1, day)
+                    taskCreationCallback.onDateChanged(selectedDate)
+                    taskCreationCallback.onToggleDatePicker(false)
+                },
+                initialYear,
+                initialMonth,
+                initialDay
+            ).apply {
                 setOnCancelListener {
                     taskCreationCallback.onToggleDatePicker(false)
                 }

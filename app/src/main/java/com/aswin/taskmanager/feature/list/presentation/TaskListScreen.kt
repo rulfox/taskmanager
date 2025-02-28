@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -90,6 +91,7 @@ fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskLi
         FloatingActionButton(
             onClick = taskListingCallback.onCreateTaskClicked,
             modifier = Modifier
+                .navigationBarsPadding()
                 .padding(16.dp)
                 .align(Alignment.BottomEnd)
         ) {

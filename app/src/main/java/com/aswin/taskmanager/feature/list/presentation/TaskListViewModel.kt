@@ -67,22 +67,10 @@ class TaskListViewModel @Inject constructor(
                 viewModelScope.launch {
                     deleteTaskUseCase(id = intent.taskUiState.id)
                 }
-                /*val mutableTasks = _state.value.tasks.toMutableList()
-                if (mutableTasks.remove(intent.taskUiState)) {
-                    _state.value = _state.value.copy(tasks = mutableTasks)
-                }*/
             }
             is TaskListIntent.OnTaskCompleted -> {
                 viewModelScope.launch {
                     updateTaskStatusUseCase(id = intent.taskUiState.id, status = Status.COMPLETED)
-                    /*val updatedTasks = _state.value.tasks.map { task ->
-                        if (task.id == intent.taskUiState.id) {
-                            task.copy(status = Status.COMPLETED)
-                        } else {
-                            task
-                        }
-                    }
-                    _state.value = _state.value.copy(tasks = updatedTasks)*/
                 }
             }
             is TaskListIntent.OnFilterApplied -> {
@@ -97,8 +85,16 @@ class TaskListViewModel @Inject constructor(
                         listOf(Status.COMPLETED)
                     }
                 }
-                _state.value = _state.value.copy(statuses = statuses)
+                _state.value = _state.value.copy(statuses = statuses, showFilter = false, selectedFilter = intent.filterStatus)
                 observeTasks(statuses = statuses)
+            }
+
+            TaskListIntent.ShowFilter -> {
+                _state.value = _state.value.copy(showFilter = true)
+            }
+
+            TaskListIntent.OnFilterDismissRequested -> {
+                _state.value = _state.value.copy(showFilter = false)
             }
         }
     }

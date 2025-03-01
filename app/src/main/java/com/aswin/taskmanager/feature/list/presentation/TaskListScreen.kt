@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aswin.taskmanager.core.room.entity.Priority
 import com.aswin.taskmanager.core.room.entity.Status
 import com.aswin.taskmanager.core.util.ComposeUtils.isPortrait
@@ -66,7 +67,9 @@ fun TaskListScreen(
         onTaskDeleted = { viewModel.processIntent(TaskListIntent.OnTaskDeleted(it)) },
         onTaskCompleted = { viewModel.processIntent(TaskListIntent.OnTaskCompleted(it)) },
         onCreateTaskClicked = { onCreateTask() },
-        onFilterApplied = { viewModel.processIntent(TaskListIntent.OnFilterApplied(it)) }
+        onFilterRequested = { viewModel.processIntent(TaskListIntent.ShowFilter) },
+        onFilterApplied = { viewModel.processIntent(TaskListIntent.OnFilterApplied(it)) },
+        onFilterDismissRequested = { viewModel.processIntent(TaskListIntent.OnFilterDismissRequested) },
     )
 
     if(isPortrait()){
@@ -87,7 +90,9 @@ fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskLi
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
             TaskManagerAppBar(
-                onFilterSelected = taskListingCallback.onFilterApplied
+                onFilterRequested = {
+                    taskListingCallback.onFilterRequested()
+                }
             )
             LazyColumn(modifier = Modifier.fillMaxSize().weight(1f)) {
                 items(
@@ -124,7 +129,17 @@ fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskLi
         ) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Task")
         }
-
+        if(state.showFilter){
+            FilterBottomSheet(
+                selectedFilter = state.selectedFilter,
+                onSelected = {
+                    taskListingCallback.onFilterApplied(it)
+                },
+                onDismissRequest = {
+                    taskListingCallback.onFilterDismissRequested()
+                }
+            )
+        }
     }
 }
 

@@ -8,5 +8,7 @@ data class TaskListCallback (
     val onCreateTaskClicked: () -> Unit = {},
     val onTaskDeleted:(TaskUiState) -> Unit = {},
     val onTaskCompleted: (TaskUiState) -> Unit = {},
-    val onFilterApplied: (FilterStatus) -> Unit = {}
+    val onFilterApplied: (FilterStatus) -> Unit = {},
+    val onFilterRequested: () -> Unit = {},
+    val onFilterDismissRequested: () -> Unit = {}
 )

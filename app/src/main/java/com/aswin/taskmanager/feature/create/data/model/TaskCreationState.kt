@@ -8,7 +8,7 @@ import kotlinx.datetime.toLocalDateTime
 data class TaskCreationState(
     var title: String = "",
     var description: String ?= null,
-    var priority: PriorityState = PriorityState.LOW,
+    var priority: PriorityState = PriorityState.MEDIUM,
     var dueDate: LocalDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
 
     var priorities: List<PriorityState> = listOf(

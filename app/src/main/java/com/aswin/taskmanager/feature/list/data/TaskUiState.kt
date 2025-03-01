@@ -16,5 +16,7 @@ data class TaskUiState(
     val dueDate: LocalDate,
     val status: Status,
     val showDescription: Boolean,
-    val priorityColor: Color
+    val priorityColor: Color,
+    val isCompleted: Boolean,
+    val isDue: Boolean
 )

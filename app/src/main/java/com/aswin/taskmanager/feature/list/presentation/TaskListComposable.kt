@@ -77,18 +77,53 @@ fun TaskItem(taskUiState: TaskUiState, onTaskClicked: (TaskUiState) -> Unit = {}
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            Box(
+            Row(
                 modifier = Modifier
                     .padding(top = 9.dp, end = 16.dp)
-                    .clip(shape = RoundedCornerShape(31.dp))
-                    .background(color = Color(0xfff0f0f0))
                     .align(alignment = Alignment.TopEnd)
-            ){
-                Text(
-                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
-                    text = taskUiState.dueDateFormatted,
-                    style = MaterialTheme.typography.bodySmall
-                )
+            ) {
+                if(taskUiState.isCompleted){
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .clip(shape = RoundedCornerShape(31.dp))
+                            .background(color = Color(0xff00A707).copy(alpha = 0.1f))
+                    ){
+                        Text(
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                            text = "Completed",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color(0xff00A707)
+                            )
+                        )
+                    }
+                } else if(taskUiState.isDue) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .clip(shape = RoundedCornerShape(31.dp))
+                            .background(color = Color(0xffF56D91).copy(alpha = 0.1f))
+                    ){
+                        Text(
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                            text = "Due",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color(0xffF56D91)
+                            )
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(31.dp))
+                        .background(color = Color(0xfff0f0f0))
+                ){
+                    Text(
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                        text = taskUiState.dueDateFormatted,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
             Row(modifier = Modifier.fillMaxWidth()){
                 Column(
@@ -107,7 +142,7 @@ fun TaskItem(taskUiState: TaskUiState, onTaskClicked: (TaskUiState) -> Unit = {}
                         )
                         Column(modifier = Modifier.fillMaxWidth().padding(start = 8.dp)) {
                             Text(
-                                text = "Task 1",
+                                text = "Task ${taskUiState.id}",
                                 color = Color(0xff6e6a7c),
                                 style = MaterialTheme.typography.labelSmall
                             )
@@ -313,6 +348,25 @@ fun EmptyTasksPlaceHolder(modifier: Modifier) {
     )
 }
 
+@Composable
+fun EmptyTasksImagePlaceHolder(modifier: Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.empty_tasks),
+            contentDescription = "No Task Created"
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 24.dp),
+            text = "No Task Created",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
 @Preview(showBackground = true, name = "Light Mode")
 @Composable
 fun TTaskItemPreview() {
@@ -327,6 +381,8 @@ fun TTaskItemPreview() {
         statusFormatted = "Pending",
         id = 1,
         showDescription = true,
-        priorityColor = Color(0xfff99600)
+        priorityColor = Color(0xfff99600),
+        isCompleted = true,
+        isDue = false
     ))
 }

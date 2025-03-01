@@ -172,6 +172,7 @@ fun TaskDetailContentPortrait(
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp),
+
                         ) {
                             Image(
                                 modifier = Modifier.padding(top = 4.dp),
@@ -189,6 +190,39 @@ fun TaskDetailContentPortrait(
                                     text = taskUiState.dueDate.formatDate(pattern = "d MMMM, yyyy"),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
+                            }
+                            if(taskUiState.isCompleted){
+                                Box(
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .clip(shape = RoundedCornerShape(31.dp))
+                                        .background(color = Color(0xff00A707).copy(alpha = 0.1f))
+                                        .align(Alignment.CenterVertically)
+                                ){
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                                        text = "Completed",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = Color(0xff00A707)
+                                        )
+                                    )
+                                }
+                            } else if(taskUiState.isDue) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .clip(shape = RoundedCornerShape(31.dp))
+                                        .background(color = Color(0xffF56D91).copy(alpha = 0.1f))
+                                        .align(Alignment.CenterVertically)
+                                ){
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                                        text = "Due",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = Color(0xffF56D91)
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -245,7 +279,9 @@ fun TaskDetailContentPortraitPreview() {
             statusFormatted = "Pending",
             id = 1,
             showDescription = true,
-            priorityColor = Color(0xfff99600)
+            priorityColor = Color(0xfff99600),
+            isCompleted = true,
+            isDue = false
         )
     ), TaskDetailCallback())
 }

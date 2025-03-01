@@ -110,7 +110,7 @@ fun TaskListingContentPortrait(state: TaskListState, taskListingCallback: TaskLi
         }
 
         if(state.showEmptyTasks){
-            EmptyTasksPlaceHolder(
+            EmptyTasksImagePlaceHolder(
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -144,7 +144,9 @@ fun TaskListingContentPortraitPreviewLight() {
                 statusFormatted = "Pending",
                 id = 1,
                 showDescription = true,
-                priorityColor = Color(0xfff99600)
+                priorityColor = Color(0xfff99600),
+                isCompleted = true,
+                isDue = false
             )
         )
     ), taskListingCallback = TaskListCallback())

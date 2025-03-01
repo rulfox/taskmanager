@@ -25,4 +25,7 @@ interface TaskDao {
 
     @Query("UPDATE tasks SET status = :status WHERE id = :id")
     suspend fun updateTaskStatus(id: Int, status: Status): Int
+
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    suspend fun getTaskById(id: Int): Task?
 }

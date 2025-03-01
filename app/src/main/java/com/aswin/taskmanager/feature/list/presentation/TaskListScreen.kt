@@ -21,22 +21,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.aswin.taskmanager.R
 import com.aswin.taskmanager.core.room.entity.Priority
 import com.aswin.taskmanager.core.room.entity.Status
 import com.aswin.taskmanager.core.util.ComposeUtils.isPortrait
+import com.aswin.taskmanager.core.util.showShortToast
 import com.aswin.taskmanager.feature.list.data.TaskListCallback
 import com.aswin.taskmanager.feature.list.data.TaskListIntent
 import com.aswin.taskmanager.feature.list.data.TaskListState
+import com.aswin.taskmanager.feature.list.data.TaskListUiEvent
 import com.aswin.taskmanager.feature.list.data.TaskUiState
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -44,9 +42,25 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun TaskListScreen(
     viewModel: TaskListViewModel = hiltViewModel(),
-    onCreateTask: () -> Unit = {}
+    onCreateTask: () -> Unit = {},
+    onTaskDetail: (Int) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collectLatest {
+            when(it){
+                is TaskListUiEvent.OnTaskClicked -> {
+                    onTaskDetail(it.taskUiState.id)
+                }
+                is TaskListUiEvent.ShowError -> {
+                    context.showShortToast(it.message)
+                }
+            }
+        }
+    }
+
     val taskListingCallback = TaskListCallback(
         onTaskClicked = { viewModel.processIntent(TaskListIntent.OnTaskClicked(it)) },
         onTaskDeleted = { viewModel.processIntent(TaskListIntent.OnTaskDeleted(it)) },

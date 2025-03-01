@@ -126,9 +126,12 @@ fun TaskCreationContentPortrait(
     val focusManager = LocalFocusManager.current
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            CreateTaskAppbar(onBackPressed = {
-                taskCreationCallback.onBackPressed()
-            })
+            CreateTaskAppbar(
+                title = stringResource(R.string.app_name),
+                onBackPressed = {
+                    taskCreationCallback.onBackPressed()
+                }
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -245,7 +248,7 @@ fun TaskCreationContentPortrait(
                             )
                             BasicTextField(
                                 value = state.description?:"",
-                                onValueChange = taskCreationCallback.onTitleChanged,
+                                onValueChange = taskCreationCallback.onDescriptionChanged,
                                 textStyle = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.fillMaxWidth(),
                                 decorationBox = { innerTextField ->

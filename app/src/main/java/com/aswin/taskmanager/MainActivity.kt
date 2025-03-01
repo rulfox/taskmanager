@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.aswin.taskmanager.core.navigation.Screen
 import com.aswin.taskmanager.feature.create.presentation.TaskCreationScreen
 import com.aswin.taskmanager.feature.details.presentation.TaskDetailScreen
@@ -35,17 +36,28 @@ class MainActivity : ComponentActivity() {
                     startDestination = Screen.TaskListScreen
                 ) {
                     composable<Screen.TaskListScreen> {
-                        TaskListScreen(onCreateTask = {
-                            navController.navigate(Screen.TaskCreationScreen)
-                        })
+                        TaskListScreen(
+                            onCreateTask = {
+                                navController.navigate(Screen.TaskCreationScreen)
+                            },
+                            onTaskDetail = {
+                                navController.navigate(Screen.TaskDetailScreen(it))
+                            }
+                        )
                     }
                     composable<Screen.TaskCreationScreen> {
                         TaskCreationScreen(onBackPressed = {
                             navController.navigateUp()
                         })
                     }
-                    composable<Screen.TaskDetailScreen> {
-                        TaskDetailScreen()
+                    composable<Screen.TaskDetailScreen> { backStackEntry ->
+                    val data: Screen.TaskDetailScreen = backStackEntry.toRoute()
+                        TaskDetailScreen(
+                            id = data.id,
+                            onBackPressed = {
+                                navController.navigateUp()
+                            }
+                        )
                     }
                     composable<Screen.SettingsScreen> {
                         SettingsScreen()

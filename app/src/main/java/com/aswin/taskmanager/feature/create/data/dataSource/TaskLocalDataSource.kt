@@ -11,6 +11,8 @@ interface TaskLocalDataSource {
 
     suspend fun updateTaskStatus(id: Int, status: Status): Int
 
+    suspend fun getTaskById(id: Int): Task?
+
     fun getAllTasks(): Flow<List<Task>>
 
     fun getTasksByStatus(statuses: List<Status>): Flow<List<Task>>

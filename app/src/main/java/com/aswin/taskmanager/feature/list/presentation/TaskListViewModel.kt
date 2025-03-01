@@ -59,7 +59,9 @@ class TaskListViewModel @Inject constructor(
     fun processIntent(intent: TaskListIntent){
         when(intent){
             is TaskListIntent.OnTaskClicked -> {
-
+                viewModelScope.launch {
+                    _event.emit(TaskListUiEvent.OnTaskClicked(intent.taskUiState))
+                }
             }
             is TaskListIntent.OnTaskDeleted -> {
                 viewModelScope.launch {

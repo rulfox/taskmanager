@@ -48,7 +48,7 @@ import com.aswin.taskmanager.ui.theme.TaskManagerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateTaskAppbar(onBackPressed: () -> Unit) {
+fun CreateTaskAppbar(title: String, onBackPressed: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     TopAppBar(
         title = {
@@ -59,7 +59,7 @@ fun CreateTaskAppbar(onBackPressed: () -> Unit) {
                     modifier = Modifier.fillMaxWidth().weight(1f).clickable {
                         onBackPressed()
                     },
-                    text = stringResource(R.string.create_task),
+                    text = title,
                     textAlign = TextAlign.Center
                 )
             }
@@ -204,6 +204,7 @@ fun CreateTaskAppbarPreview() {
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 CreateTaskAppbar(
+                    title = "Title Test",
                     onBackPressed = {}
                 )
             }

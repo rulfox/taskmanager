@@ -48,7 +48,20 @@ class TaskRepositoryImpl @Inject constructor(
             Timber.e(e)
             return Result.failure(Exception("Task update failed"))
         }
+    }
 
+    override suspend fun getTaskById(id: Int): Result<Task> {
+        try {
+            val taskGetResult = taskLocalDataSource.getTaskById(id = id)
+            taskGetResult?.let {
+                return Result.success(it)
+            }?: run {
+                return Result.failure(Exception("No task found"))
+            }
+        } catch(e: Exception) {
+            Timber.e(e)
+            return Result.failure(Exception("Task details fetching failed"))
+        }
     }
 
     override fun getAllTasks(): Flow<List<Task>> {

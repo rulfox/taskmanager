@@ -7,7 +7,7 @@ sealed interface Screen {
     data object TaskListScreen: Screen
 
     @Serializable
-    data object TaskDetailScreen: Screen
+    data class TaskDetailScreen(val id: Int): Screen
 
     @Serializable
     data object TaskCreationScreen: Screen

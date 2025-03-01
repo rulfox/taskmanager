@@ -49,6 +49,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.isEmpty
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -58,6 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -140,7 +143,7 @@ fun TaskCreationContentPortrait(
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.Start
             ) {
-
+                val focusRequester = remember { FocusRequester() }
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = "Create Task",
@@ -149,7 +152,8 @@ fun TaskCreationContentPortrait(
 
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth().padding(top = 22.dp)
+                        .fillMaxWidth()
+                        .padding(top = 22.dp)
                         .clip(shape = RoundedCornerShape(size = 15.dp))
                 ) {
                     Row(modifier = Modifier
@@ -170,19 +174,35 @@ fun TaskCreationContentPortrait(
                                 value = state.title,
                                 onValueChange = taskCreationCallback.onTitleChanged,
                                 textStyle = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                                 decorationBox = { innerTextField ->
-                                    Box(modifier = Modifier.fillMaxWidth().padding(start = 8.dp)) {
+                                    Box(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 8.dp)) {
                                         innerTextField()
                                     }
-                                }
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    imeAction = ImeAction.Done,
+                                    capitalization = KeyboardCapitalization.Sentences
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                    }
+                                ),
                             )
+                            LaunchedEffect(Unit) {
+                                focusRequester.requestFocus()
+                            }
                         }
                     }
                 }
 
                 PriorityDropDown(
-                    modifier = Modifier.fillMaxWidth().padding(top = 22.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 22.dp),
                     priorities = state.priorities,
                     selectedPriorityState = state.priority,
                     onPriorityStateChanged = taskCreationCallback.onPriorityChanged
@@ -197,23 +217,28 @@ fun TaskCreationContentPortrait(
                         .fillMaxWidth()
                         .clip(shape = RoundedCornerShape(size = 15.dp))
                 ) {
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp),
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 16.dp),
                     ) {
                         Image(
                             modifier = Modifier.padding(top = 4.dp),
                             painter = painterResource(id = R.drawable.rounded_calendar),
                             contentDescription = "Due Date"
                         )
-                        Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)) {
                             Text(
                                 modifier = Modifier.padding(start = 8.dp),
                                 text = "Due Date",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 8.dp),
                                 text = state.dueDate.formatDate(pattern = "d MMMM, yyyy"),
                                 style = MaterialTheme.typography.bodyLarge
                             )
@@ -229,7 +254,8 @@ fun TaskCreationContentPortrait(
 
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth().padding(top = 22.dp)
+                        .fillMaxWidth()
+                        .padding(top = 22.dp)
                         .clip(shape = RoundedCornerShape(size = 15.dp))
                 ) {
                     Row(modifier = Modifier
@@ -251,8 +277,12 @@ fun TaskCreationContentPortrait(
                                 onValueChange = taskCreationCallback.onDescriptionChanged,
                                 textStyle = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.fillMaxWidth(),
+                                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                                 decorationBox = { innerTextField ->
-                                    Box(modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 80.dp).padding(start = 8.dp)) {
+                                    Box(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .defaultMinSize(minHeight = 80.dp)
+                                        .padding(start = 8.dp)) {
                                         innerTextField()
                                     }
                                 }
